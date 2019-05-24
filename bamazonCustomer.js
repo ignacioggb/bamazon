@@ -26,16 +26,16 @@ connection.query("SELECT * FROM products", function (err, res) {
 
     
     function buy() {
-        console.log("Proceed to buy")
+        console.log("\n Proceed to buy \n")
         inquirer.prompt([{
             type: "input",
-            message: "Type item id:",
+            message: "Type item id of the product you want to buy: \n",
             name: "item_id"
         }]).then(function (resp) {
             item=resp.item_id;
             inquirer.prompt([{
                 type: "input",
-                message: "Type quantity to buy:",
+                message: "Type quantity to buy: ",
                 name: "item_qty"
             }]).then(function (resp2) {
                 qty=resp2.item_qty;
@@ -51,7 +51,11 @@ connection.query("SELECT * FROM products", function (err, res) {
                 var updated_qty=res[0].stock_quantity-qty;
                connection.query("UPDATE products SET stock_quantity=? WHERE item_id=?", [updated_qty, item], function (err, res) {if (err) throw err;
                 connection.query("SELECT price FROM products WHERE item_id=?", item, function (err, res2) {if (err) throw err;
-                    console.log("there are "+updated_qty+" units left \n Total cost: "+parseInt(res2[0].price)*parseInt(qty)+"\n Thank you for your purchase");
+                            var total=parseInt(res2[0].price)*parseInt(qty);
+                    connection.query("UPDATE products SET products_sale_column=? WHERE item_id=?", [total, item], function (err, res3) {if (err) throw err;
+                        console.log("there are "+updated_qty+" units left \n Total cost: "+total+"\n Thank you for your purchase");
+                    });
+                    
                     connection.end();
                 });
                 
